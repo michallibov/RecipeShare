@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator, Pressable, Animated } from 'react-native';
+import { View, Image, Text, StyleSheet, ActivityIndicator, Pressable, Animated, TouchableOpacity } from 'react-native';
 import { updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import Star from './Star';
 import { FontAwesome } from '@expo/vector-icons';
-import {Collapse,CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
+import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
 const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
     const [starRating, setStarRating] = useState(null);
@@ -15,6 +16,7 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
     const [savedRecipe, setSavedRecipe] = useState(false);
     const [savingLoading, setSavingLoading] = useState(false);
     const [animation] = useState(new Animated.Value(0));
+    const navigation = useNavigation(); // Use useNavigation hook to get navigation prop
     
     useEffect(() => {
         const fetchData = async () => {
@@ -24,7 +26,6 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
                 setStarRating(userRating ? userRating.rating : null);
                 setAverageRating(recipe.ratings ? calculateAverageRating(recipe.ratings) : 0);
                 await checkIfSaved();
-                console.log(recipe.ingredients)
             } catch (error) {
                 console.error('Error in useEffect:', error);
             } finally {
@@ -33,7 +34,7 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
         };
 
         fetchData();
-    }, [recipe.ratings, currentUserEmail]);
+    }, [recipe.ratings, currentUserEmail, recipe.comments]);
 
     useEffect(() => {
         Animated.timing(animation, {
@@ -56,7 +57,7 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
         } catch (error) {
             console.error('Error checking if recipe is saved:', error);
         }
-    }
+    };
 
     const calculateAverageRating = (ratings) => {
         if (ratings.length === 0) {
@@ -86,7 +87,7 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
             console.error('Error saving recipe:', error);
             setSavingLoading(false);
         }
-    }
+    };
 
     const setRating = async (rating) => {
         try {
@@ -113,7 +114,7 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
             await updateDoc(recipeRef, { ratings: updatedRatings });
 
             setStarRating(rating);
-            setAverageRating(calculateAverageRating(updatedRatings)); 
+            setAverageRating(calculateAverageRating(updatedRatings));
             setIsLoading(false);
         } catch (error) {
             console.error('Error updating ratings:', error);
@@ -170,6 +171,11 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
                                 <Text style={styles.rating}>{averageRating}/5</Text>
                             </>
                         )}
+                    </View>
+                    <View style={styles.comments}>
+                        <TouchableOpacity style={styles.commentsButton} onPress={() => navigation.navigate('Comments', {recipe: recipe})}>
+                            <Text style={styles.commentsButtonText}>Comments</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -245,6 +251,23 @@ const styles = StyleSheet.create({
     author: {
         alignItems: 'center',
         marginBottom: 3
+    },
+    comments: {
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 5
+    },
+    commentsButton: {
+        backgroundColor: '#6e492a',
+        padding: 5,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'white'
+    },
+    commentsButtonText: {
+        color: 'white',
+        fontWeight: 'bold'
     }
 });
 

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Navbar from './app/navigation/Navbar';
 import Login from './app/screens/Login';
 import SignUp from './app/screens/SignUp';
+import Comments from './app/screens/Comments';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,12 @@ export default function App() {
             name="SignUp"
             component={SignUp}
             options={{ headerShown: false }}
-          />
+        />
+        <Stack.Screen
+          name="Comments" 
+          component={Comments}
+          options={{ headerShown: false }}
+        />
         </Stack.Navigator>
       </NavigationContainer>
   );

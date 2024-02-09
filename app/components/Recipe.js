@@ -17,8 +17,8 @@ const Recipe = ({ index, recipe, onChange }) => {
     const [image, setImage] = useState(recipe.image);
     const [instructions, setInstructions] = useState(recipe.instructions);
     const [newInstructions, setNewInstructions] = useState(instructions);
-    const [ingredients, setIngredients] = useState(recipe.ingredients);
     const [editing, setEditing] = useState(false);
+    const [shared, setShared] = useState(recipe.shared);
 
     const deleteRecipe = async (item) => {
         try {
@@ -41,7 +41,7 @@ const Recipe = ({ index, recipe, onChange }) => {
             const recipeRef = await doc(FIREBASE_DB, 'recipes', recipe.id);
             const querySnapshot = await getDocs(collection(FIREBASE_DB, 'Users'));
             const userData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-
+           
             const updatedRecipe = {
                 email: auth.currentUser.email,
                 title: newTitle,
@@ -49,9 +49,9 @@ const Recipe = ({ index, recipe, onChange }) => {
                 instructions: newInstructions,
                 image: image || 'https://www.greatwall.lk/assets/image/default.png',
                 ratings: recipe.ratings,
-                nickname: userData[0].nickname
+                nickname: userData[0].nickname,
+                shared: shared ? shared : false
             }
-            console.log(updatedRecipe)
             await updateDoc(recipeRef, updatedRecipe);
             setEditing(false);
             setIsLoading(false);
@@ -70,7 +70,20 @@ const Recipe = ({ index, recipe, onChange }) => {
     const addIngredient = () => {
         const newIngredient = { id: String(newIngredients.length + 1), name: '' };
         setNewIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
-      };
+    };
+
+    const share = async () => {
+        
+        try {
+            const recipeRef = await doc(FIREBASE_DB, 'recipes', recipe.id);
+           
+            await updateDoc(recipeRef, { shared: !shared });
+            setShared(!shared);
+            onChange();
+        } catch (error) {
+            console.log(error)
+        }
+    }
     
   return (
         <View key={index} style={styles.item}>
@@ -99,7 +112,7 @@ const Recipe = ({ index, recipe, onChange }) => {
                             <FontAwesome name='edit' size={20} />
                         </TouchableOpacity>
                     }
-                </React.Fragment>
+              </React.Fragment>
             </View>
             <Text style={styles.subTitles}>Ingredients:</Text>
             <View style={editing && styles.editingStyle}>
@@ -147,9 +160,14 @@ const Recipe = ({ index, recipe, onChange }) => {
                 style={editing ? styles.editingStyle : styles.notEditingStyle}
                 onChange={(text) => setNewInstructions(text)}
                 placeholderTextColor={editing ? 'black' : 'gray'}
+                editable={editing}
             >
                 {instructions}
-            </TextInput>
+          </TextInput>
+          {!editing && <View style={styles.shareButtonView}>
+              <TouchableOpacity style={styles.shareButton} onPress={share}>
+                  <Text style={styles.shareButtonText}>{shared ? 'Stop Sharing' : 'Share'}</Text>
+              </TouchableOpacity></View>}
         </View>
   )
 }
@@ -224,6 +242,23 @@ const styles = StyleSheet.create({
         color: 'black',
         paddingBottom: 5
     },
+    shareButtonView: {
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    shareButton: {
+        backgroundColor: '#6e492a',
+        paddingVertical: 6,
+        paddingHorizontal: '20%',
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'white'
+    },
+    shareButtonText: {
+        color: 'white',
+        fontWeight: 'bold'
+    }
 })
 
 export default Recipe;

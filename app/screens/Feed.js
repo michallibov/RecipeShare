@@ -9,7 +9,7 @@ import Search from '../components/Search';
 import RecipeCard from '../components/RecipeCard';
 import globalStyles from '../config/colors';
 
-const Feed = () => {
+const Feed = ({navigation}) => {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +80,7 @@ const Feed = () => {
                   </View>
                 ) : (
                   filteredRecipes.map((recipe, index) => (
-                    <RecipeCard
+                    recipe.shared && <RecipeCard
                       key={index}
                       recipe={recipe}
                       isOpen={openRecipeId === recipe.id}

@@ -31,7 +31,10 @@ const Navbar = () => {
             screenOptions={({ route }) => ({
                 tabBarShowLabel: false,
                 tabBarStyle: {
-                position: 'absolute',
+                    position: 'absolute',
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center',
                 bottom: 25,
                 left: 20,
                 right: 20,

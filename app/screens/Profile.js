@@ -5,7 +5,6 @@ import { getDocs, collection, updateDoc, doc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { useFocusEffect } from '@react-navigation/native';
-import { FontAwesome } from '@expo/vector-icons';
 import ImagePickerComponent from '../components/ImagePickerComponent';
 
 const Profile = () => {
@@ -21,15 +20,16 @@ const Profile = () => {
             setIsLoading(true);
             const auth = getAuth();
             const user = auth.currentUser;
-
-            if (user) {
+          if (user) {
+            console.log(user);
                 const querySnapshot = await getDocs(collection(FIREBASE_DB, 'Users'));
 
                 const userData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-                setImage(userData[0].image || '../assets/chef.png');
-                setEmail(userData[0].email);
-                setNickname(userData[0].nickname);
-                setUserID(userData[0].id);
+            const currentUser = userData.filter(usr => usr.email === user.email);
+              setImage(currentUser[0].image || '../assets/chef.png');
+                setEmail(currentUser[0].email);
+                setNickname(currentUser[0].nickname);
+                setUserID(currentUser[0].id);
                 setIsLoading(false);
             }
             } catch (error) {
@@ -75,19 +75,28 @@ const Profile = () => {
                         <View style={styles.detail}>
                             <Text style={styles.label}>Email:</Text>
                             <TextInput
-                                style={!editable ? styles.input : styles.input}
+                                style={[
+                                  styles.input,
+                                  !editable && { color: 'gray' }, 
+                              ]}
                                 placeholder={email}
                                 onChangeText={(text) => setEmail(text)}
                                 editable={editable}
+                                value={email}
                                 placeholderTextColor={editable ? 'black' : 'gray'}
+                  
                             />
                         </View>
                         <View style={styles.detail}>
                             <Text style={styles.label}>Nickname:</Text>
                             <TextInput
-                                style={styles.input}
+                                style={[
+                                  styles.input,
+                                  !editable && { color: 'gray' }, 
+                              ]}
                                 placeholder={nickname ? nickname : 'You did not choose a nickname yet!'}
                                 onChangeText={(text) => setNickname(text)}
+                                value={nickname}
                                 editable={editable}
                                 placeholderTextColor={editable ? 'black' : 'gray'}
                             />
@@ -165,7 +174,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16
-  },
+  }
 })
 
 export default Profile;

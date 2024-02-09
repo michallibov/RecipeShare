@@ -86,9 +86,11 @@ function NewRecipe({navigation}) {
                 instructions: instructions,
                 image: recipeImage,
                 ratings: [],
-                nickname: querySnapshot.docs[0].data().nickname
+                nickname: querySnapshot.docs[0].data().nickname,
+                shared: false,
+                comments: []
             };
-            console.log(instructions);
+
             try {
                 const myCollection = collection(FIREBASE_DB, 'recipes');
                 await addDoc(myCollection, data);
