@@ -114,7 +114,7 @@ function NewRecipe({navigation}) {
 
     return (
         <SafeAreaView style={globalStyles.container}>
-            <ScrollView >
+            <ScrollView style={styles.scrollView}>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
@@ -124,25 +124,28 @@ function NewRecipe({navigation}) {
                     />
                     <View style={styles.ingredientsList}>
                         {ingredients.map((item, index) => (
-                            <IngredientComponent
-                                key={item.id}
-                                item={item}
-                                onMeasurementChange={(value) => {
-                                    const updatedIngredients = [...ingredients];
-                                    console.log(value)
-                                    updatedIngredients[index].measurement = value;
-                                    setIngredients(updatedIngredients);
-                                }}
-                                onQuantityChange={(quantity) => {
-                                    const updatedIngredients = [...ingredients];
-                                    updatedIngredients[index].quantity = quantity;
-                                }}
-                                onNameChange={(name) => {
-                                    const updatedIngredients = [...ingredients];
-                                    updatedIngredients[index].name = name;
-                                }}
-                                onDelete={deleteIngredient}
-                            />
+                            <ScrollView key={item.id}>
+                                <IngredientComponent
+                                    key={item.id}
+                                    item={item}
+                                    onMeasurementChange={(value) => {
+                                        const updatedIngredients = [...ingredients];
+                                        console.log(value)
+                                        updatedIngredients[index].measurement = value;
+                                        setIngredients(updatedIngredients);
+                                    }}
+                                    onQuantityChange={(quantity) => {
+                                        const updatedIngredients = [...ingredients];
+                                        updatedIngredients[index].quantity = quantity;
+                                    }}
+                                    onNameChange={(name) => {
+                                        const updatedIngredients = [...ingredients];
+                                        updatedIngredients[index].name = name;
+                                    }}
+                                    onDelete={deleteIngredient}
+                                />
+                            </ScrollView>
+                            
                         ))}
                         <TouchableOpacity style={globalStyles.addButton} onPress={addIngredient}>
                             <Text style={globalStyles.buttonTextStyle}>Add Ingredient</Text>
@@ -185,7 +188,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: StatusBar.currentHeight || 0,
-        marginBottom: 90
+        marginBottom: 100
+    },
+    scrollView: {
+        marginBottom: 100
     },
     inputContainer: {
         flex: 1,

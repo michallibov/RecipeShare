@@ -40,6 +40,7 @@ const CommentComponent = ({ comment, recipe, onDeleteComment }) => {
                 return c;
             });
             await updateDoc(recipeRef, { comments: updatedComments });
+
             return updatedComment;
         } catch (error) {
             console.error('Error updating comment:', error);
@@ -52,16 +53,20 @@ const CommentComponent = ({ comment, recipe, onDeleteComment }) => {
             setIsLoading(true); 
 
             let updatedComment;
-
             if (like) {
+                console.log("Liked");
                 const updatedLikes = comment.likes.filter(email => email !== currentUserEmail);
+                console.log(updatedLikes);
                 updatedComment = { ...comment, likes: updatedLikes };
             } else if (dislike) {
+                console.log("Disliked");
                 const updatedDislikes = comment.dislikes.filter(email => email !== currentUserEmail);
                 const updatedLikes = [...comment.likes, currentUserEmail];
                 updatedComment = { ...comment, dislikes: updatedDislikes, likes: updatedLikes };
             } else {
+                console.log("None"+ comment.likes);
                 const updatedLikes = [...comment.likes, currentUserEmail];
+                console.log(updatedLikes);
                 updatedComment = { ...comment, likes: updatedLikes };
             }
 
@@ -71,6 +76,8 @@ const CommentComponent = ({ comment, recipe, onDeleteComment }) => {
             setNumOfLikes(updatedComment.likes.length);
             setDislike(updatedComment.dislikes.includes(currentUserEmail));
             setLike(updatedComment.likes.includes(currentUserEmail));
+            console.log(updateComment);
+            console.log("Commnet: " + comment.likes);
         } catch (error) {
             console.log(error);
         } finally {
@@ -121,24 +128,26 @@ const CommentComponent = ({ comment, recipe, onDeleteComment }) => {
                 </View>
                 <Text style={styles.commentText}>{comment.comment}</Text>
             </View>
-            <View style={styles.actionsContainer}>
-                <TouchableOpacity style={[styles.iconButton, { marginRight: 10 }]} onPress={handleLike}>
-                    <FontAwesome
-                        name={like ? 'thumbs-up' : 'thumbs-o-up'}
-                        size={20}
-                        color={like ? 'blue' : 'black'}
-                    />
-                    <Text style={{ marginLeft: 5 }}>{numOfLikes}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton} onPress={handleDislike}>
-                    <FontAwesome
-                        name={dislike ? 'thumbs-down' : 'thumbs-o-down'}
-                        size={20}
-                        color={dislike ? 'red' : 'black'}
-                    />
-                    <Text style={{ marginLeft: 5 }}>{numOfDislikes}</Text>
-                </TouchableOpacity>
-            </View>
+            {isLoading ? <ActivityIndicator size={20} color={'black'} /> : 
+                <View style={styles.actionsContainer}>
+                    <TouchableOpacity style={[styles.iconButton, { marginRight: 10 }]} onPress={handleLike}>
+                        <FontAwesome
+                            name={like ? 'thumbs-up' : 'thumbs-o-up'}
+                            size={20}
+                            color={like ? 'blue' : 'black'}
+                        />
+                        <Text style={{ marginLeft: 5 }}>{numOfLikes}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconButton} onPress={handleDislike}>
+                        <FontAwesome
+                            name={dislike ? 'thumbs-down' : 'thumbs-o-down'}
+                            size={20}
+                            color={dislike ? 'red' : 'black'}
+                        />
+                        <Text style={{ marginLeft: 5 }}>{numOfDislikes}</Text>
+                    </TouchableOpacity>
+                </View>
+            }
             {getAuth().currentUser.email === comment.author.email && (
                 <TouchableOpacity style={styles.deleteButton} onPress={deleteComment}>
                     <FontAwesome name='trash-o' size={20} color='gray' />
