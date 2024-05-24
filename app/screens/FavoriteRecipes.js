@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { Text, StyleSheet, ScrollView, View, ActivityIndicator, RefreshControl } from 'react-native'
 import { getAuth } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getDocs, collection } from 'firebase/firestore';
+import { query, where, getDocs, collection } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import Search from '../components/Search'
 import { useFocusEffect } from '@react-navigation/native';
@@ -22,8 +22,9 @@ FavoriteRecipes = () => {
           const user = auth.currentUser;
     
           if (user) {
-            const querySnapshot = await getDocs(collection(FIREBASE_DB, 'FavoriteRecipes'),
-              where('email', '==', user.email));
+            const querySnapshot = await getDocs(
+              query(collection(FIREBASE_DB, 'FavoriteRecipes'), where('email', '==', user.email))
+            );
             const recipesData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
               setRecipes(recipesData);
               console.log(recipes)

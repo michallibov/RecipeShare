@@ -22,7 +22,6 @@ const MyRecipes = () => {
   
             if (user) {
                 const userEmail = user.email;
-                console.log(userEmail);
                 const querySnapshot = await getDocs(
                     query(collection(FIREBASE_DB, 'Recipes'), where('email', '==', userEmail))
                 );
