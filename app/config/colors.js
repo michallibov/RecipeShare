@@ -16,6 +16,20 @@ const globalStyles = StyleSheet.create({
         fontWeight: 'bold',
         textShadowColor: 'black',
     },
+    errorMessage: {
+        color: 'darkred',
+        fontWeight: 'bold',
+    },
+    errorBox: {
+        padding: 4,
+        marginTop: 4,
+        backgroundColor: 'salmon',
+        borderWidth: 1,
+        borderColor: 'darkred',
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
 });
 
 export default globalStyles;

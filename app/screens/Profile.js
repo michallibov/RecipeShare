@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getDocs, collection, updateDoc, doc } from 'firebase/firestore';
+import { getDocs, collection, updateDoc, doc, query, where } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { useFocusEffect } from '@react-navigation/native';
 import ImagePickerComponent from '../components/ImagePickerComponent';
+import globalStyles from '../config/colors';
 
 const Profile = () => {
     const [image, setImage] = useState('../assets/chef.png');
@@ -14,6 +15,7 @@ const Profile = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [editable, setEditable] = useState(false);
     const [userID, setUserID] = useState('');
+    const [nicknameError, setNicknameError] = useState('');
 
     const fetchUserData = async () => {
         try {
@@ -22,19 +24,19 @@ const Profile = () => {
             const user = auth.currentUser;
           if (user) {
             console.log(user);
-                const querySnapshot = await getDocs(collection(FIREBASE_DB, 'Users'));
+            const querySnapshot = await getDocs(collection(FIREBASE_DB, 'Users'));
 
-                const userData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            const userData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
             const currentUser = userData.filter(usr => usr.email === user.email);
-              setImage(currentUser[0].image || '../assets/chef.png');
-                setEmail(currentUser[0].email);
-                setNickname(currentUser[0].nickname);
-                setUserID(currentUser[0].id);
-                setIsLoading(false);
-            }
-            } catch (error) {
-            console.error('Error fetching recipes:', error);
+            setImage(currentUser[0].image || '../assets/chef.png');
+            setEmail(currentUser[0].email);
+            setNickname(currentUser[0].nickname);
+            setUserID(currentUser[0].id);
             setIsLoading(false);
+          }
+        } catch (error) {
+          console.error('Error fetching recipes:', error);
+          setIsLoading(false);
         }
     };
 
@@ -45,23 +47,66 @@ const Profile = () => {
     );
 
     const handleEditPress = async () => {
-        if (editable) {
-            try {
-                setIsLoading(true);
-                const userRef = doc(FIREBASE_DB, 'Users', userID);
-                const newDetails = {
-                    email: email,
-                    image: image || '../assets/chef.png' , 
-                    nickname: nickname
-                }
-                await updateDoc(userRef, newDetails);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error updating user data:', error);
-            }
-        }
-        setEditable(!editable);
-    };
+      if (editable) {
+        console.log(nickname)
+          if (await checkNicknameExists() || nickname == '') {
+              setNicknameError('');
+              try {
+                  setIsLoading(true);
+                  const userRef = doc(FIREBASE_DB, 'Users', userID);
+                  const newDetails = {
+                      email: email,
+                      image: image || '../assets/chef.png',
+                      nickname: nickname
+                  }
+                  await updateDoc(userRef, newDetails);
+                  await updateNickname();
+                  setIsLoading(false);
+                  setEditable(false); 
+              } catch (error) {
+                  console.error('Error updating user data:', error);
+              }
+          } else {
+              setNicknameError("This nickname is already in use. please choose another one");
+          }
+      } else {
+          setEditable(true);
+      }
+  };
+
+  const checkNicknameExists = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        query(collection(FIREBASE_DB, 'Users'), where('nickname', '==', nickname))
+      )
+      console.log(querySnapshot.empty)
+      return querySnapshot.empty;
+    }
+    catch (error) {
+      console.log("Error checking nickname: ", error);
+      return false;
+    }
+  }
+  
+  const updateNickname = async () => {
+      try {
+        const querySnapshot = await getDocs(
+            query(collection(FIREBASE_DB, 'Recipes'), where('email', '==', email))
+        );
+        const recipesData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+
+        const batch = [];
+        recipesData.forEach(recipe => {
+            const recipeRef = doc(FIREBASE_DB, 'Recipes', recipe.id);
+            const updatedRecipe = { ...recipe, nickname: nickname ? nickname : email};
+            batch.push(updateDoc(recipeRef, updatedRecipe));
+        });
+
+        await Promise.all(batch);
+      } catch (error) {
+        console.error('Error updating nickname for recipes:', error);
+      }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -100,6 +145,10 @@ const Profile = () => {
                                 editable={editable}
                                 placeholderTextColor={editable ? 'black' : 'gray'}
                             />
+                            {nicknameError && <View style={globalStyles.errorBox}>
+                                <Text style={globalStyles.errorMessage}>{nicknameError}</Text>            
+                              </View>
+                            }
                         </View>
                     </View>    
                 </>

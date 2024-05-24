@@ -72,7 +72,7 @@ const Login = ({ navigation }) => {
                     onChangeText={(text) => setEmail(text)}
                     value={email}
                 />
-                {emailError && <View style={styles.errorBox}><Text style={styles.errorMessage}>{emailError}</Text></View>}
+                {emailError && <View style={globalStyles.errorBox}><Text style={globalStyles.errorMessage}>{emailError}</Text></View>}
                 <TextInput
                     style={[styles.input, styles.passwordInput]}
                     placeholder="Password"
@@ -80,7 +80,7 @@ const Login = ({ navigation }) => {
                     onChangeText={(text) => setPassword(text)}
                     value={password}
                 />
-                {passwordError && <View style={styles.errorBox}><Text style={styles.errorMessage}>{passwordError}</Text></View>}
+                {passwordError && <View style={globalStyles.errorBox}><Text style={globalStyles.errorMessage}>{passwordError}</Text></View>}
                 <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                     {isLoading ? (
                         <ActivityIndicator color="white" />
@@ -125,20 +125,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
-    },
-    errorMessage: {
-        color: 'darkred',
-        fontWeight: 'bold',
-    },
-    errorBox: {
-        padding: 4,
-        marginTop: 4,
-        backgroundColor: 'salmon',
-        borderWidth: 1,
-        borderColor: 'darkred',
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center'
     },
     logoStyle: {
         height: 200,
