@@ -3,7 +3,13 @@ import { StyleSheet, View, TouchableOpacity, TextInput, Text } from 'react-nativ
 import { Dropdown } from 'react-native-element-dropdown';
 import { FontAwesome } from '@expo/vector-icons';
 
-const IngredientComponent = ({ item, onMeasurementChange, onQuantityChange, onNameChange, onDelete }) => {
+const IngredientComponent = ({ 
+    item = {}, 
+    onMeasurementChange = () => {}, 
+    onQuantityChange = () => {}, 
+    onNameChange = () => {}, 
+    onDelete = () => {} 
+}) => {
     const [measurement, setMeasurement] = useState(item.measurement ? item.measurement : '');
     const [name, setName] = useState(item.name ? item.name : '');
     const [quantity, setQuantity] = useState(item.quantity ? item.quantity : '');
@@ -23,8 +29,9 @@ const IngredientComponent = ({ item, onMeasurementChange, onQuantityChange, onNa
         { label: 'Milliliter', value: '8' },
         { label: 'Liter', value: '9' },
         { label: 'Gram', value: '10' },
-        { label: 'Kilograms', value: '11' },
-        {label: '', value: '12'}
+        { label: 'Kilogram', value: '11' },
+        { label: 'Piece', value: '12'},
+        {label: '', value: '13'}
     ];
 
     const renderLabel = (item,index) => {

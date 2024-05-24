@@ -23,21 +23,27 @@ const SignUp = ({ navigation }) => {
         if (!emailRegex.test(email)) {
             setEmailNotValid(true);
             setEmailError('Please enter a valid email!');
+            return false;
         } else {
             setEmailNotValid(false);
             setEmailError('');
         }
+        return true;
     };
 
     const checkPassword = () => {
-        if (password.length < 6) setPasswordNotValid(true);
-        else setPasswordNotValid(false);
+        if (password.length < 6) {
+            setPasswordNotValid(true);
+            return false;
+        }
+        setPasswordNotValid(false);
+        return true;    
     };
 
     const handleSignUp = async () => {
-        checkEmail();
-        checkPassword();
-        if (emailNotValid || passwordNotValid) return;
+        const validEmail = checkEmail();
+        const validPass = checkPassword();
+        if (!validEmail || !validPass) return;
 
         if (email === '' || password === '') {
             alert('Please fill all the information!');
@@ -108,7 +114,7 @@ const SignUp = ({ navigation }) => {
                 onChangeText={(text) => setPassword(text)}
                 value={password}
             />
-            {passwordNotValid && <Text style={styles.errorText}>Password must be at least 6 characters!</Text>}
+            {passwordNotValid && <Text style={styles.errorText}>Password must contain at least 6 characters!</Text>}
 
             <Text style={styles.label}>Verify Password *</Text>
             <TextInput

@@ -22,7 +22,7 @@ const Recipe = ({ index, recipe, onChange }) => {
 
     const deleteRecipe = async (item) => {
         try {
-            const recipeRef = doc(FIREBASE_DB, 'recipes', item.id);
+            const recipeRef = doc(FIREBASE_DB, 'Recipes', item.id);
             await deleteDoc(recipeRef);
             alert("Recipe deleted successfully!");
             onChange();
@@ -38,7 +38,7 @@ const Recipe = ({ index, recipe, onChange }) => {
         }
         try {
             const auth = getAuth();
-            const recipeRef = await doc(FIREBASE_DB, 'recipes', recipe.id);
+            const recipeRef = await doc(FIREBASE_DB, 'Recipes', recipe.id);
             const querySnapshot = await getDocs(collection(FIREBASE_DB, 'Users'));
             const userData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
            
@@ -73,9 +73,9 @@ const Recipe = ({ index, recipe, onChange }) => {
     };
 
     const share = async () => {
-        
+        console.log("hey")
         try {
-            const recipeRef = await doc(FIREBASE_DB, 'recipes', recipe.id);
+            const recipeRef = await doc(FIREBASE_DB, 'Recipes', recipe.id);
            
             await updateDoc(recipeRef, { shared: !shared });
             setShared(!shared);
@@ -161,6 +161,7 @@ const Recipe = ({ index, recipe, onChange }) => {
                 onChange={(text) => setNewInstructions(text)}
                 placeholderTextColor={editing ? 'black' : 'gray'}
                 editable={editing}
+                multiline={true}
             >
                 {instructions}
           </TextInput>

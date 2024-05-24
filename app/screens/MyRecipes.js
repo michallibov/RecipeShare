@@ -24,7 +24,7 @@ const MyRecipes = () => {
                 const userEmail = user.email;
                 console.log(userEmail);
                 const querySnapshot = await getDocs(
-                    query(collection(FIREBASE_DB, 'recipes'), where('email', '==', userEmail))
+                    query(collection(FIREBASE_DB, 'Recipes'), where('email', '==', userEmail))
                 );
   
                 const recipesData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));

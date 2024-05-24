@@ -7,6 +7,7 @@ import Star from './Star';
 import { FontAwesome } from '@expo/vector-icons';
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
+import Tag from './Tag';
 
 const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
     const [starRating, setStarRating] = useState(null);
@@ -150,6 +151,11 @@ const RecipeCard = ({ recipe, isOpen, toggleRecipe }) => {
                             <Text style={styles.subTitle}>Instructions:</Text>
                             <Text>{recipe.instructions}</Text>
                         </View>
+                        <View style={styles.tagsView}>
+                            {recipe.tags && recipe.tags.map((tag) => {
+                                return <Tag name={tag} chosenTags={[]} />
+                            })}
+                        </View>
                     </CollapseBody>
                 </Collapse>
                 <View>
@@ -268,6 +274,9 @@ const styles = StyleSheet.create({
     commentsButtonText: {
         color: 'white',
         fontWeight: 'bold'
+    },
+    tagsView: {
+        flexDirection: 'row'
     }
 });
 

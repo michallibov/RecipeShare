@@ -23,10 +23,11 @@ const Feed = ({navigation}) => {
       const user = auth.currentUser;
 
       if (user) {
-        const querySnapshot = await getDocs(collection(FIREBASE_DB, 'recipes'));
+        const querySnapshot = await getDocs(collection(FIREBASE_DB, 'Recipes'));
 
         const recipesData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-        setRecipes(recipesData);
+        const recipesWithUniqueIds = recipesData.map((recipe, index) => ({ ...recipe, id: `${recipe.id}_${index}` }));
+        setRecipes(recipesWithUniqueIds);
         setFilteredRecipes(recipesData); 
         setIsLoading(false);
       }
@@ -42,6 +43,19 @@ const Feed = ({navigation}) => {
       recipe.title.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredRecipes(filtered);
+    setIsLoading(false);
+  };
+
+  const handleFilter = (filters) => {
+    setIsLoading(true);
+    if (filters.length === 0) {
+      setFilteredRecipes(recipes);
+    } else {
+      const filtered = recipes.filter(recipe =>
+        filters.every(filter => recipe.tags.includes(filter))
+      );
+      setFilteredRecipes(filtered);
+    }
     setIsLoading(false);
   };
 
@@ -71,7 +85,7 @@ const Feed = ({navigation}) => {
         />
       }
       >
-        <Search onSearch={handleSearch} />
+        <Search onSearch={handleSearch} onFilter={handleFilter}/>
         {isLoading ? <ActivityIndicator size={40} color={'black'}/> : 
                 <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
                 {filteredRecipes.length === 0 ? (
@@ -79,9 +93,10 @@ const Feed = ({navigation}) => {
                     <Text>No matching recipes found!</Text>
                   </View>
                 ) : (
-                  filteredRecipes.map((recipe, index) => (
+                  filteredRecipes.map((recipe) => (
                     recipe.shared && <RecipeCard
-                      key={index}
+                      key={recipe.id}
+                      id={recipe.id}
                       recipe={recipe}
                       isOpen={openRecipeId === recipe.id}
                       toggleRecipe={toggleRecipe}

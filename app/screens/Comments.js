@@ -76,7 +76,7 @@ const Comments = ({ route }) => {
 
     const deleteComment = async (index) => {
         try {
-            const recipeRef = doc(FIREBASE_DB, 'recipes', recipe.id);
+            const recipeRef = doc(FIREBASE_DB, 'Recipes', recipe.id);
             const recipeSnapshot = await getDoc(recipeRef);
             const recipeData = recipeSnapshot.data();
             const updatedComments = [...recipeData.comments];

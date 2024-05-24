@@ -22,8 +22,8 @@ FavoriteRecipes = () => {
           const user = auth.currentUser;
     
           if (user) {
-            const querySnapshot = await getDocs(collection(FIREBASE_DB, 'favorite-recipes'));
-    
+            const querySnapshot = await getDocs(collection(FIREBASE_DB, 'FavoriteRecipes'),
+              where('email', '==', user.email));
             const recipesData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
               setRecipes(recipesData);
               console.log(recipes)

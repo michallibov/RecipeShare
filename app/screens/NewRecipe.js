@@ -17,13 +17,15 @@ import { FIREBASE_DB } from '../../FirebaseConfig';
 import IngredientComponent from '../components/IngredientComponent';
 import globalStyles from '../config/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Tag from '../components/Tag';
 
 function NewRecipe({navigation}) {
     const [title, setTitle] = useState('');
     const [ingredients, setIngredients] = useState([]);
     const [instructions, setInstructions] = useState('');
     const [image, setImage] = useState(null);
-    
+    const [chosenTags, setChosenTags] = useState([]);
+
     const addIngredient = () => {
         const newIngredient = { id: String(ingredients.length + 1), name: '' };
         setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
@@ -88,17 +90,19 @@ function NewRecipe({navigation}) {
                 ratings: [],
                 nickname: querySnapshot.docs[0].data().nickname,
                 shared: false,
-                comments: []
+                comments: [],
+                tags: chosenTags
             };
 
             try {
-                const myCollection = collection(FIREBASE_DB, 'recipes');
+                const myCollection = collection(FIREBASE_DB, 'Recipes');
                 await addDoc(myCollection, data);
                 alert("Your recipe is saved!");
                 setImage(null);
                 setIngredients([]);
                 setInstructions('');
                 setTitle('');
+                setChosenTags([]);
                 navigation.navigate('Feed');
             } catch (error) {
                 console.error('Error adding recipe:', error);
@@ -110,6 +114,12 @@ function NewRecipe({navigation}) {
         setIngredients((prevIngredients) =>
         prevIngredients.filter((ingredient) => ingredient.id !== id)
         );
+    }
+
+    const handleTagClick = (name) => {  
+        chosenTags.includes(name) ? 
+            setChosenTags((prevTags) => prevTags.filter((tag) => tag !== name)) :
+            setChosenTags((prevTags) => [...prevTags, name]);
     }
 
     return (
@@ -127,6 +137,7 @@ function NewRecipe({navigation}) {
                             <ScrollView key={item.id}>
                                 <IngredientComponent
                                     key={item.id}
+                                    id={item.id}
                                     item={item}
                                     onMeasurementChange={(value) => {
                                         const updatedIngredients = [...ingredients];
@@ -159,6 +170,13 @@ function NewRecipe({navigation}) {
                         multiline={true}
                         numberOfLines={4}
                     />
+                    <View style={styles.tagStyle}>
+                        <Tag name='Vegan' pressedTag={handleTagClick} touchable={true} chosenTags={chosenTags} />
+                        <Tag name='Kosher' pressedTag={handleTagClick} touchable={true} chosenTags={chosenTags} />
+                        <Tag name='Halal' pressedTag={handleTagClick} touchable={true} chosenTags={chosenTags} />
+                        <Tag name='Vegetarian' pressedTag={handleTagClick} touchable={true} chosenTags={chosenTags} />
+                        <Tag name='Gluten Free' pressedTag={handleTagClick} touchable={true} chosenTags={chosenTags} />
+                    </View>
                     <TouchableOpacity style={[globalStyles.addButton, styles.buttonMargin]} onPress={pickImage}>
                         <Text style={globalStyles.buttonTextStyle}>Pick Image</Text>
                     </TouchableOpacity>
@@ -290,6 +308,10 @@ const styles = StyleSheet.create({
     },
     buttonMargin: {
         marginBottom: 8
+    },
+    tagStyle: {
+        flexDirection: 'row',
+        justifyContent: 'center'
     }
 })
 
